@@ -1,52 +1,64 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 
-function TaskList() {
+const TaskList = () => {
   const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState("");
+  const [newTaskName, setNewTaskName] = useState('');
 
   useEffect(() => {
-    const savedTasks = localStorage.getItem("tasks");
-    if (savedTasks) {
-      setTasks(JSON.parse(savedTasks));
+    // Cargar las tareas desde el localStorage al iniciar la aplicación
+    const storedTasks = JSON.parse(localStorage.getItem('tasks'));
+    if (storedTasks) {
+      setTasks(storedTasks);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    // Guardar las tareas actualizadas en el localStorage cada vez que cambie el estado de las tareas
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+
+    // Mostrar las tareas en la consola
+    console.log('Tareas almacenadas en localStorage:', tasks);
   }, [tasks]);
 
   const addTask = () => {
-    if (newTask.trim() !== "") {
+    if (newTaskName.trim() !== '') {
+      const newTask = {
+        name: newTaskName,
+        completed: false,
+      };
       setTasks([...tasks, newTask]);
-      setNewTask("");
+      setNewTaskName('');
     }
+  };
+
+  const handleTaskToggle = (index) => {
+    const updatedTasks = [...tasks];
+    updatedTasks[index].completed = !updatedTasks[index].completed;
+    setTasks(updatedTasks);
   };
 
   return (
     <div>
-      <h2>Task List</h2>
-      <ul>
-        {tasks.map((task, index) => (
-          <li key={index}>{task}</li>
-        ))}
-      </ul>
+      <h1>Task List</h1>
       <input
         type="text"
-        value={newTask}
-        onChange={(e) => setNewTask(e.target.value)}
+        value={newTaskName}
+        onChange={(e) => setNewTaskName(e.target.value)}
       />
       <button onClick={addTask}>Add Task</button>
+
+      {tasks.map((task, index) => (
+        <div key={index}>
+          <input
+            type="checkbox"
+            checked={task.completed}
+            onChange={() => handleTaskToggle(index)}
+          />
+          <span>{task.name}</span>
+        </div>
+      ))}
     </div>
   );
-}
+};
 
-function App() {
-  return (
-    <div>
-      <h1>My React Task List</h1>
-      <TaskList />
-    </div>
-  );
-}
-
-export default App;
+export default TaskList;
