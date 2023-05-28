@@ -1,17 +1,41 @@
 import React from 'react';
+import useTaskList from './useTaskList';
 import Task from './Task';
 
 const TaskList = () => {
-  const tasks = [
-    { id: 1, name: 'Mejorar en programación', completed: false },
-    { id: 2, name: 'Mejorar tocando la guitarra', completed: true },
-    { id: 3, name: 'encontrar un mejor trabajo', completed: false },
-  ];
+  const {
+    tasks,
+    newTaskName,
+    setNewTaskName,
+    createTask,
+    deleteTask,
+    updateTask,
+  } = useTaskList();
+
+  const handleTaskToggle = (index) => {
+    const updatedTask = { ...tasks[index] };
+    updatedTask.completed = !updatedTask.completed;
+    updateTask(index, updatedTask);
+  };
 
   return (
     <div>
-      {tasks.map((task) => (
-        <Task key={task.id} task={task} />
+      <h1>Task List</h1>
+      <input
+        type="text"
+        value={newTaskName}
+        onChange={(e) => setNewTaskName(e.target.value)}
+      />
+      <button onClick={createTask}>Add Task</button>
+
+      {tasks.map((task, index) => (
+        <Task
+          key={task.id}
+          task={task}
+          onDelete={() => deleteTask(task.id)}
+          onUpdate={(updatedTask) => updateTask(task.id, updatedTask)}
+          onToggle={() => handleTaskToggle(index)}
+        />
       ))}
     </div>
   );
