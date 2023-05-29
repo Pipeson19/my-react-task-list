@@ -1,34 +1,29 @@
-import React, { useState } from 'react';
+import React from 'react';
+import useTaskManager from './components/useTaskManager';
 import TaskList from './components/TaskList';
 
 const App = () => {
-  const [taskName, setTaskName] = useState('');
-  const [taskDescription, setTaskDescription] = useState('');
-  const [taskNameError, setTaskNameError] = useState('');
-
-  const handleTaskNameChange = (event) => {
-    setTaskName(event.target.value);
-  };
-
-  const handleTaskDescriptionChange = (event) => {
-    setTaskDescription(event.target.value);
-  };
+  const { tasks, addTask, removeTask } = useTaskManager();
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
 
-    if (taskName.length < 3) {
-      setTaskNameError('Task name must have at least 3 characters');
-    } else {
-      // Aquí puedes guardar la tarea en tu lógica de aplicación
-      console.log('Task name:', taskName);
-      console.log('Task description:', taskDescription);
+    // Obtener los valores del formulario
+    const taskName = event.target.elements.taskName.value;
+    const taskDescription = event.target.elements.taskDescription.value;
 
-      // Reiniciar los campos del formulario después de guardar la tarea
-      setTaskName('');
-      setTaskDescription('');
-      setTaskNameError('');
-    }
+    // Crear una nueva tarea
+    const newTask = {
+      id: Date.now(), // Puedes generar el ID de la tarea de forma única
+      name: taskName,
+      description: taskDescription,
+    };
+
+    // Agregar la tarea usando el hook
+    addTask(newTask);
+
+    // Reiniciar los campos del formulario
+    event.target.reset();
   };
 
   return (
@@ -39,33 +34,21 @@ const App = () => {
         <div>
           <label>
             Task Name
-            <input
-              type="text"
-              value={taskName}
-              onChange={handleTaskNameChange}
-            />
+            <input type="text" name="taskName" />
           </label>
-          {taskNameError && (
-            <span className="error" role="alert">
-              {taskNameError}
-            </span>
-          )}
         </div>
 
         <div>
           <label>
             Task Description
-            <textarea
-              value={taskDescription}
-              onChange={handleTaskDescriptionChange}
-            />
+            <textarea name="taskDescription" />
           </label>
         </div>
 
         <button type="submit">Save Task</button>
       </form>
 
-      <TaskList />
+      <TaskList tasks={tasks} removeTask={removeTask} />
     </div>
   );
 };
