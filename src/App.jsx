@@ -1,56 +1,21 @@
-import React from 'react';
-import useTaskManager from './components/useTaskManager';
-import TaskList from './components/TaskList';
+import React from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Home from "./components/Home";
+import Tareas from "./components/Tareas";
+import SobreNosotros from "./components/SobreNosotros";
+import Menu from "./components/Menu";
 
-const App = () => {
-  const { tasks, addTask, removeTask } = useTaskManager();
-
-  const handleFormSubmit = (event) => {
-    event.preventDefault();
-
-    // Obtener los valores del formulario
-    const taskName = event.target.elements.taskName.value;
-    const taskDescription = event.target.elements.taskDescription.value;
-
-    // Crear una nueva tarea
-    const newTask = {
-      id: Date.now(), // Puedes generar el ID de la tarea de forma única
-      name: taskName,
-      description: taskDescription,
-    };
-
-    // Agregar la tarea usando el hook
-    addTask(newTask);
-
-    // Reiniciar los campos del formulario
-    event.target.reset();
-  };
-
+export function App() {
   return (
-    <div>
-      <h1>My App</h1>
-
-      <form onSubmit={handleFormSubmit}>
-        <div>
-          <label>
-            Task Name
-            <input type="text" name="taskName" />
-          </label>
-        </div>
-
-        <div>
-          <label>
-            Task Description
-            <textarea name="taskDescription" />
-          </label>
-        </div>
-
-        <button type="submit">Save Task</button>
-      </form>
-
-      <TaskList tasks={tasks} removeTask={removeTask} />
-    </div>
+    <Router>
+      <div>
+        <Menu />
+        <Switch>
+          <Route exact path="/" component={Home} />
+          <Route path="/tareas" component={Tareas} />
+          <Route path="/sobre-nosotros" component={SobreNosotros} />
+        </Switch>
+      </div>
+    </Router>
   );
-};
-
-export default App;
+}
