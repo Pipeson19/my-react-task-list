@@ -1,52 +1,95 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-const useTaskList = () => {
-  const [tasks, setTasks] = useState([]);
-  const [newTaskName, setNewTaskName] = useState('');
+const localStorageKey = "todo:savedTaskList";
+
+function useTaskList() {
+  const [taskList, setTaskList] = useState([]);
+  
+  function loadSavedTaskList() {
+    const saved = localStorage.getItem(localStorageKey);
+    if (saved) {
+      setTaskList(JSON.parse(saved));
+    }
+  }
 
   useEffect(() => {
-    const storedTasks = JSON.parse(localStorage.getItem('tasks'));
-    if (storedTasks) {
-      setTasks(storedTasks);
-    }
+    loadSavedTaskList();
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    console.log('Tareas almacenadas en localStorage:', tasks);
-  }, [tasks]);
+  function setTaskListSave(newTaskList) {
+    setTaskList(newTaskList);
+    localStorage.setItem(localStorageKey, JSON.stringify(newTaskList));
+  }
 
-  const createTask = () => {
-    if (newTaskName.trim() !== '') {
-      const newTask = {
-        name: newTaskName,
-        completed: false,
-      };
-      setTasks([...tasks, newTask]);
-      setNewTaskName('');
-    }
-  };
+  function addTask(taskTitle, taskDescription) {
+    setTaskListSave([
+      ...taskList,
+      {
+        id: crypto.randomUUID(),
+        title: taskTitle,
+        description: taskDescription,
+        isCompleted: false,
+      },
+    ]);
+  }
 
-  const deleteTask = (taskId) => {
-    const updatedTasks = tasks.filter((task) => task.id !== taskId);
-    setTasks(updatedTasks);
-  };
+  function deleteTaskById(taskId) {
+    const newTaskList = taskList.filter((task) => task.id !== taskId);
+    setTaskListSave(newTaskList);
+  }
 
-  const updateTask = (taskId, updatedTask) => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === taskId ? updatedTask : task
-    );
-    setTasks(updatedTasks);
-  };
+  function toggleTaskCompleteById(taskId) {
+    const newTaskList = taskList.map((task) => {
+      if (task.id === taskId) {
+        return {
+          ...task,
+          isCompleted: !task.isCompleted,
+        };
+      }
+      return task;
+    });
+    setTaskListSave(newTaskList);
+  }
+
+  function updateTaskTitleById(taskId, updatedTitle) {
+    const newTaskList = taskList.map((task) => {
+      if (task.id === taskId) {
+        return {
+          ...task,
+          title: updatedTitle,
+        };
+      }
+      return task;
+    });
+    setTaskListSave(newTaskList);
+  }
+
+  function completeAllTasks() {
+    const allTasksCompleted = taskList.every((task) => task.isCompleted);
+
+    const newTaskList = taskList.map((task) => ({
+      ...task,
+      isCompleted: !allTasksCompleted,
+    }));
+
+    setTaskListSave(newTaskList);
+  }
+
+  function deleteAllTasks() {
+    setTaskList([]);
+    localStorage.removeItem(localStorageKey);
+  }
 
   return {
-    tasks,
-    newTaskName,
-    setNewTaskName,
-    createTask,
-    deleteTask,
-    updateTask,
+    taskList,
+    addTask,
+    deleteTaskById,
+    toggleTaskCompleteById,
+    updateTaskTitleById,
+    deleteAllTasks,
+    completeAllTasks,
   };
-};
+}
 
 export default useTaskList;
+

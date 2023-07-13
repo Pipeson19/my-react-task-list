@@ -1,21 +1,20 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import Home from "./components/Home";
-import Tareas from "./components/Tareas";
-import SobreNosotros from "./components/SobreNosotros";
-import Menu from "./components/Menu";
+import { BrowserRouter, Route, Routes } from "react-router-dom"
+import AboutUs from "./pages/AboutUs";
+import Home from "./pages/Home";
+import Tasks from "./pages/Tasks";
+import Menu from "./Menu";
 
-export function App() {
+function App() {
   return (
-    <Router>
-      <div>
-        <Menu />
-        <Switch>
-          <Route exact path="/" component={Home} />
-          <Route path="/tareas" component={Tareas} />
-          <Route path="/sobre-nosotros" component={SobreNosotros} />
-        </Switch>
-      </div>
-    </Router>
+    <BrowserRouter>
+    <Menu />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/tasks" element={<Tasks />} />
+        <Route path="/about" element={<AboutUs />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
+
+export default App;
