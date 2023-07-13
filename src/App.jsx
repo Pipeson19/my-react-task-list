@@ -1,14 +1,21 @@
-import React from 'react';
-import TaskList from './components/TaskList';
+import Header from "./components/Header"
+import TaskList from "./components/TaskList"
+import useTaskList from "./components/useTaskList";
 
+function App() {
+  const { taskList, addTask, deleteTaskById, toggleTaskCompleteById } =
+    useTaskList();
 
-const App = () => {
   return (
-    <div>
-      <h1>My App</h1>
-      <TaskList />
-    </div>
+    <>
+      <Header onAddTask={addTask} />
+      <TaskList
+        onDelete={deleteTaskById}
+        taskList={taskList}
+        onComplete={toggleTaskCompleteById}
+      />
+    </>
   );
-};
+}
 
 export default App;
